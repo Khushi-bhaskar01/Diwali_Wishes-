@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎆 DevSource Wishes You Happy Diwali 🎆</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at bottom, #0b0b0b 0%, #000 80%);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header img {
+      margin-top: 20px;
+      width: 120px;
+      height: auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin: 0.5em 0;
+    }
+    h2 {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 0.5em;
+    }
+    canvas#fireworks {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .bottom-diya {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .bottom-diya img {
+      width: 80px;
+      height: auto;
+      animation: glow 1.5s infinite alternate;
+    }
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 5px gold); }
+      to { filter: drop-shadow(0 0 20px orange); }
+    }
+    .sound-btn {
+      position: fixed;
+      top: 20px; right: 20px;
+      z-index: 3;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid white;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 1.8rem; }
+      h2 { font-size: 1.2rem; }
+      header img { width: 90px; }
+      .bottom-diya img { width: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <button class="sound-btn" onclick="toggleSound()">🔊 Sound On</button>
+
+  <canvas id="fireworks"></canvas>
+
+  <header>
+    <img src="DevSource_LOGO.png" alt="DevSource Logo">
+  </header>
+
+  <main>
+    <h1>🔥✨ Happy Diwali ✨🔥</h1>
+    <h2>🪔DevSource wishes you a Bright & Joyful Festival 🪔</h2>
+    <p style="text-align:center; font-style:italic;">🪔 “This Diwali, may your ideas compile perfectly, your dreams deploy smoothly, and your journey light up like festive code”🚀🔥</p>
+  </main>
+
+  <div class="bottom-diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+    <img src="diyas.png" alt="Diya">
+  </div>
+
+  <audio id="cracker-sound" preload="auto" loop>
+    <source src="fire-crackers.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const sound = document.getElementById('cracker-sound');
+    const soundBtn = document.querySelector('.sound-btn');
+    let soundOn = false;
+
+    function toggleSound() {
+      soundOn = !soundOn;
+      if (soundOn) {
+        sound.currentTime = 0;
+        sound.play().catch(err => console.log('Sound blocked:', err));
+        soundBtn.textContent = '🔇 Sound Off';
+      } else {
+        sound.pause();
+        soundBtn.textContent = '🔊 Sound On';
+      }
+    }
+
+    // Play sound on first tap anywhere (fix autoplay restriction)
+    document.body.addEventListener('click', () => {
+      if (!soundOn) {
+        sound.play().then(() => {
+          soundOn = true;
+          soundBtn.textContent = '🔇 Sound Off';
+        }).catch(err => console.log(err));
+      }
+    }, { once: true });
+
+    // Fireworks
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    let fireworks = [];
+    let particles = [];
+    resize();
+    window.addEventListener('resize', resize);
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    class Firework {
+      constructor(x, y, targetY) {
+        this.x = x; this.y = y; this.targetY = targetY;
+        this.speed = 5;
+        this.burst = false;
+      }
+      update() {
+        this.y -= this.speed;
+        if (this.y < this.targetY && !this.burst) {
+          this.burst = true;
+          for (let i = 0; i < 50; i++) particles.push(new Particle(this.x, this.y));
+        }
+      }
+      draw() {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(this.x, this.y, 2, 10);
+      }
+    }
+
+    class Particle {
+      constructor(x, y) {
+        this.x = x; this.y = y;
+        this.vx = Math.random() * 4 - 2;
+        this.vy = Math.random() * 4 - 2;
+        this.life = 100;
+        this.color = `hsl(${Math.random()*360}, 100%, 60%)`;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.02;
+        this.life--;
+      }
+      draw() {
+        ctx.globalAlpha = this.life/100;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (Math.random() < 0.05) fireworks.push(new Firework(Math.random()*canvas.width, canvas.height, Math.random()*canvas.height/2));
+      fireworks.forEach((f,i) => {
+        f.update();
+        f.draw();
+        if (f.burst && f.y < 0) fireworks.splice(i,1);
+      });
+      particles.forEach((p,i)=>{
+        p.update();
+        p.draw();
+        if (p.life <= 0) particles.splice(i,1);
+      });
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>  
